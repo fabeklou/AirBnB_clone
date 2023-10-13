@@ -6,11 +6,17 @@ import cmd
 import json
 from models.base_model import BaseModel
 from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 from models import storage
 import shlex
 import sys
 
-implemented_classes = ["BaseModel", "User"]
+implemented_classes = ["BaseModel", "User", "State",
+                       "City", "Amenity", "Place", "Review"]
 """module level variable, holding the list of classes
 that the user can create an instance of
 """
@@ -84,6 +90,16 @@ class HBNBCommand(cmd.Cmd):
             obj = BaseModel()
         elif line == "User":
             obj = User()
+        elif line == "State":
+            obj = State()
+        elif line == "City":
+            obj = City()
+        elif line == "Amenity":
+            obj = Amenity()
+        elif line == "Place":
+            obj = Place()
+        elif line == "Review":
+            obj = Review()
         else:
             print("{}".format("** class doesn't exist **"))
             return
