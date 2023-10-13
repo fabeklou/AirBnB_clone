@@ -40,11 +40,12 @@ class FileStorage:
             objs_copy: dict = copy.deepcopy(self.__objects)
             dicts: dict = {key: value.to_dict()
                            for key, value in objs_copy.items()}
-            json.dump(dicts, fo)
+            json.dump(dicts, fo, indent=4)
 
     def reload(self):
         """reload: deserializes the JSON file to __objects"""
         from models.base_model import BaseModel
+        from models.user import User
         try:
             with open(self.__file_path) as fo:
                 dicts: dict = json.load(fo)
@@ -53,6 +54,8 @@ class FileStorage:
                     class_name = value["__class__"]
                     if class_name == "BaseModel":
                         self.new(BaseModel(**value))
+                    if class_name == "User":
+                        self.new(User(**value))
 
         except (IOError, FileNotFoundError) as ex:
             return
