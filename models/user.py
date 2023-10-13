@@ -4,9 +4,7 @@
 BaseModel class and is a representation of a user/sojourner
 """
 
-from models import storage
 from models.base_model import BaseModel
-import json
 
 
 class User(BaseModel):
