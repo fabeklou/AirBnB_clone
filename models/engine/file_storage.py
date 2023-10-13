@@ -46,6 +46,12 @@ class FileStorage:
         """reload: deserializes the JSON file to __objects"""
         from models.base_model import BaseModel
         from models.user import User
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.place import Place
+        from models.review import Review
+
         try:
             with open(self.__file_path) as fo:
                 dicts: dict = json.load(fo)
@@ -56,6 +62,16 @@ class FileStorage:
                         self.new(BaseModel(**value))
                     if class_name == "User":
                         self.new(User(**value))
+                    if class_name == "State":
+                        self.new(State(**value))
+                    if class_name == "City":
+                        self.new(City(**value))
+                    if class_name == "Amenity":
+                        self.new(Amenity(**value))
+                    if class_name == "Place":
+                        self.new(Place(**value))
+                    if class_name == "Review":
+                        self.new(Review(**value))
 
         except (IOError, FileNotFoundError) as ex:
             return
