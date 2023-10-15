@@ -12,6 +12,7 @@ from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
 from models import storage
+import re
 import shlex
 import sys
 
@@ -59,8 +60,8 @@ class HBNBCommand(cmd.Cmd):
     prompt: str = "(hbnb) "
     """str: prompt asking for the user to type a command"""
 
-    message = "Welcome to hbnb console, built for debugging and testing !"
-    line = "\n=========================================================="
+    message = "Welcome to hbnb console. Type 'help' for a list of commands."
+    line = "\n============================================================"
     intro: str = message + line
     """str: airbnb console welcome message"""
 
@@ -79,37 +80,32 @@ class HBNBCommand(cmd.Cmd):
         return
 
     def do_create(self, line):
-        """create: creates a new BaseModel object and saves it
-        to the file_storage
+        """create: creates a new object  of the specified type
+        and saves it to the file_storage
+
+        Usage: create <class name>
         """
         if not line:
             print("{}".format("** class name missing **"))
             return
 
-        if line == "BaseModel":
-            obj = BaseModel()
-        elif line == "User":
-            obj = User()
-        elif line == "State":
-            obj = State()
-        elif line == "City":
-            obj = City()
-        elif line == "Amenity":
-            obj = Amenity()
-        elif line == "Place":
-            obj = Place()
-        elif line == "Review":
-            obj = Review()
-        else:
-            print("{}".format("** class doesn't exist **"))
+        funcs_dict = {"BaseModel": BaseModel, "User": User,
+                      "State": State, "City": City, "Amenity": Amenity,
+                      "Place": Place, "Review": Review}
+
+        if line in funcs_dict:
+            obj = funcs_dict[line]()
+            obj.save()
+            print("{}".format(obj.id))
             return
 
-        obj.save()
-        print("{}".format(obj.id))
+        print("{}".format("** class doesn't exist **"))
 
     def do_show(self, line):
         """show: prints the string representation of an
-        instance based on the class name and id
+        instance based on the class name and the id
+
+        Usage: show <class name> <id>
         """
 
         # split the command (line) using shell-like syntax
@@ -130,7 +126,9 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, line):
         """destroy: deletes an instance based on the class name
-        and id, then saves the change into the JSON file
+        and id, then saves the change into the file storage
+
+        Usage: destroy <class name> <id>
         """
 
         # split the command (line) using shell-like syntax
@@ -153,6 +151,9 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, line):
         """all: prints all string representation of all instances
         based or not on the class name
+
+        Usage1: all
+        Usage2: all <class name>
         """
         str_rep_list: str = []
         objects: dict = storage.all()
@@ -173,8 +174,10 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, line):
         """update: updates an instance based on the class name
-        and id by adding or updating attribute and then save
-        the change into the JSON file
+        and id by adding or updating attribute and then saves
+        the change into the file storage. If the attribute value
+        is made of more than one word, it must be enclosed in
+        quotation marks
 
         Usage: update <class name> <id> <attribute name> "<attribute value>"
         """
@@ -207,8 +210,200 @@ class HBNBCommand(cmd.Cmd):
         except Exception:
             pass
 
-        setattr(objects[key], attr_name, attr_value)
-        storage.save()
+        if hasattr(objects[key], attr_name):
+            setattr(objects[key], attr_name, attr_value)
+            objects[key].save()
+
+    def default(self, line):
+        """default: runs when the command is unknown. Will be used here
+        to check if the command is using the new syntax or not and do
+        what should be done according to the result
+
+        syntax: <class_name>.method()
+        """
+        error_message: str = "*** Unknown syntax: {}".format(line)
+
+        tokens = line.strip()
+        tokens = tokens.split(".")
+
+        # If we don't have exactly two tokens, the command is wrong
+        if len(tokens) != 2:
+            print(error_message)
+            return
+
+        # Get's the class name
+        class_name = tokens[0]
+
+        # Get's the method to call and eventually the arguments
+        method = tokens[1]
+
+        if class_name not in implemented_classes:
+            print("{}".format("** class doesn't exist **"))
+            return
+
+        if method == "all()":
+            self.class_all(class_name)
+            return
+        if method == "count()":
+            self.class_count(class_name)
+            return
+
+        # Get's the opcode and the arguments in different variables
+        opcode, rest = method.split("(")
+        if rest:
+            rest = rest[:-1]
+
+        if not rest and (opcode == "show" or opcode == "destroy"):
+            print("{}".format("** instance id missing **"))
+            return
+
+        if opcode == "show" or opcode == "destroy":
+            rest = self.clean_str(rest)
+
+        if opcode == "show":
+            self.class_show(class_name, rest)
+            return
+
+        if opcode == "destroy":
+            self.class_destroy(class_name, rest)
+            return
+
+        if opcode == "update":
+            id_match = re.search(r'"[\w\-]+"', rest)
+            if id_match is None:
+                print("{}".format("** instance id missing **"))
+                return
+            else:
+                id_match = id_match.group(0)
+
+            dict_match = re.search(r'{.+}', rest)
+
+            if dict_match is not None:
+                # Replace any <'> by <"> to avoid exeption raising
+                dict_match = dict_match.group(0).replace("'", "\"")
+                try:
+                    dict_match = json.loads(dict_match)
+                except Exception:
+                    print(error_message)
+                    return
+                self.class_update_kwargs(
+                    class_name, self.clean_str(id_match), **dict_match)
+                return
+
+            attr_and_value = rest.split(", ")
+
+            if len(attr_and_value) < 2:
+                print("{}".format("** attribute name missing **"))
+                return
+            if len(attr_and_value) < 3:
+                print("{}".format("** value missing **"))
+                return
+
+            attr, value = attr_and_value[1:3]
+            self.class_update_arg(class_name, self.clean_str(id_match),
+                                  self.clean_str(attr), self.clean_str(value))
+        else:
+            print(error_message)
+
+    def class_all(self, class_name):
+        """class_all: prints the string representation of all
+        instances of a class
+
+        usage: <class name>.all()
+        """
+        str_rep_list: str = []
+        objects: dict = storage.all()
+
+        for key, obj in objects.items():
+            if obj.__class__.__name__ == class_name:
+                str_rep_list.append(str(obj))
+        print(str_rep_list)
+
+    def class_count(self, class_name):
+        """class_count: prints the number of instances of a class
+
+        usage: <class name>.count()
+        """
+        objects: dict = storage.all()
+        class_count = 0
+
+        for key, obj in objects.items():
+            if obj.__class__.__name__ == class_name:
+                class_count += 1
+        print(class_count)
+
+    def class_show(self, class_name, obj_id):
+        """class_show: prints the string representation an object
+        based on his class name and id, or an error message
+
+        usage: <class name>.show(<id>)
+        """
+        key: str = "{}.{}".format(class_name, obj_id)
+        objects: dict = storage.all()
+
+        if key in objects:
+            print(objects[key])
+            return
+
+        print("{}".format("** no instance found **"))
+
+    def class_destroy(self, class_name, obj_id):
+        """class_destroy: deletes an object
+        based on his class name and id, or an error message
+
+        usage: <class name>.destroy(<id>)
+        """
+        key: str = class_name + "." + obj_id
+        objects: dict = storage.all()
+
+        if key in objects:
+            del objects[key]
+            storage.save()
+            return
+
+        print("{}".format("** no instance found **"))
+
+    def class_update_arg(self, class_name, obj_id, attr, value):
+        """class_update_arg: update the attribute of an object
+        based on the class_name and id
+        """
+        key: str = class_name + "." + obj_id
+        objects: dict = storage.all()
+
+        if key in objects:
+            # if hasattr(objects[key], attr):
+            setattr(objects[key], attr, value)
+            objects[key].save()
+            return
+
+        print("{}".format("** no instance found **"))
+
+    def class_update_kwargs(self, class_name, obj_id, **dct):
+        """class_update_kwargs: update the attribute of an object
+        based on the class_name and id using a dict
+        """
+        key: str = class_name + "." + obj_id
+        objects: dict = storage.all()
+
+        if key in objects:
+            for attr, value in dct.items():
+                # if hasattr(objects[key], attr):
+                setattr(objects[key], attr, value)
+                objects[key].save()
+            return
+
+        print("{}".format("** no instance found **"))
+
+    def clean_str(self, string):
+        """clean_str: cleans a string by removing the a paire of
+        single quote or double quote
+        """
+        if len(string) > 3:
+            if string[0] == "\"" or string[0] == "\'":
+                string = string[1:]
+            if string[-1] == "\"" or string[-1] == "\'":
+                string = string[:-1]
+        return string
 
 
 if __name__ == '__main__':
