@@ -14,7 +14,7 @@ class FileStorage:
     deserializes JSON file to instances
 
     """
-    __file_path = "models/engine/_file-storage.json"
+    __file_path = "models/engine/_file.json"
     """str: the path to the JSON file"""
 
     __objects = {}
@@ -56,22 +56,13 @@ class FileStorage:
             with open(self.__file_path) as fo:
                 dicts: dict = json.load(fo)
 
+                funcs_dict: dict = {"BaseModel": BaseModel, "User": User, "State": State,
+                                    "City": City, "Amenity": Amenity, "Place": Place, "Review": Review}
+
                 for key, value in dicts.items():
                     class_name = value["__class__"]
-                    if class_name == "BaseModel":
-                        self.new(BaseModel(**value))
-                    if class_name == "User":
-                        self.new(User(**value))
-                    if class_name == "State":
-                        self.new(State(**value))
-                    if class_name == "City":
-                        self.new(City(**value))
-                    if class_name == "Amenity":
-                        self.new(Amenity(**value))
-                    if class_name == "Place":
-                        self.new(Place(**value))
-                    if class_name == "Review":
-                        self.new(Review(**value))
+                    if class_name in funcs_dict:
+                        self.new(funcs_dict[class_name](**value))
 
         except (IOError, FileNotFoundError) as ex:
             return
