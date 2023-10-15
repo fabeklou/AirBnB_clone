@@ -59,8 +59,10 @@ class FileStorage:
                 except json.decoder.JSONDecodeError:
                     return
 
-                funcs_dict: dict = {"BaseModel": BaseModel, "User": User, "State": State,
-                                    "City": City, "Amenity": Amenity, "Place": Place, "Review": Review}
+                funcs_dict: dict = {"BaseModel": BaseModel, "User": User,
+                                    "State": State, "City": City,
+                                    "Amenity": Amenity, "Place": Place,
+                                    "Review": Review}
 
                 for key, value in dicts.items():
                     class_name = value["__class__"]
