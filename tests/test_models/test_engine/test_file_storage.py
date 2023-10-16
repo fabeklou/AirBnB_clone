@@ -17,25 +17,45 @@ class TestFileStorage(unittest.TestCase):
     maxDiff = None
 
     def test_new_filestorage_obj(self):
-        pass
+        """creates and tests a new file_storage object"""
+        fso00 = FileStorage()
+        bmo00 = BaseModel()
 
     def test__file_path(self):
-        pass
+        """tests the __file_path private class attribute"""
+        fso01 = FileStorage()
+        bmo01 = BaseModel()
+
+        # self.assertTrue("__file_path" in fso01.__dict__)
 
     def test__objects(self):
-        pass
+        """tests the __objects private class attribute"""
+        fso02 = FileStorage()
+        bmo02 = BaseModel()
+
+        # self.assertTrue("__objects" in fso02.__dict__)
 
     def test_all_method(self):
-        pass
+        """tests the instance method all"""
+        fso03 = FileStorage()
+        bmo03 = BaseModel()
 
     def test_save_method(self):
-        pass
+        """tests the instance method save"""
+        fso04 = FileStorage()
+        bmo04 = BaseModel()
 
     def test_reload_method(self):
-        pass
+        """tests the instance method reload"""
+        fso05 = FileStorage()
+        bmo05 = BaseModel()
 
     def test_with_new_basemodel_obj(self):
-        pass
+        """tests"""
+        fso06 = FileStorage()
+        bmo06 = BaseModel()
 
     def test_when_basemodel_obj_saved(self):
-        pass
+        """tests"""
+        fso07 = FileStorage()
+        bmo07 = BaseModel()

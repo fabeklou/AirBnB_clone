@@ -62,8 +62,8 @@ class HBNBCommand(cmd.Cmd):
 
     message = "Welcome to hbnb console. Type 'help' for a list of commands."
     line = "\n============================================================"
-    intro: str = message + line
-    """str: airbnb console welcome message"""
+    # intro: str = message + line
+    # """str: airbnb console welcome message"""
 
     def do_quit(self, line):
         """quit: exits from the command interpreter"""

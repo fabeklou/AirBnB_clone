@@ -14,7 +14,7 @@ class FileStorage:
     deserializes JSON file to instances
 
     """
-    __file_path = "models/engine/_file-storage.json"
+    __file_path = "models/engine/storage.json"
     """str: the path to the JSON file"""
 
     __objects = {}

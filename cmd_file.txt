@@ -1,0 +1,1 @@
+BaseModel.update("e4354531-0243-40b0-ac39-6ad45b63fe4d", {"name": "Cousin", "age": 199})
