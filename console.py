@@ -210,9 +210,9 @@ class HBNBCommand(cmd.Cmd):
         except Exception:
             pass
 
-        if hasattr(objects[key], attr_name):
-            setattr(objects[key], attr_name, attr_value)
-            objects[key].save()
+        # if hasattr(objects[key], attr_name):
+        setattr(objects[key], attr_name, attr_value)
+        objects[key].save()
 
     def default(self, line):
         """default: runs when the command is unknown. Will be used here
