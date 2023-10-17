@@ -4,6 +4,7 @@
 class of all the other classes
 """
 
+from copy import deepcopy
 from datetime import datetime
 import uuid
 from models import storage
@@ -74,7 +75,7 @@ class BaseModel:
         __dict__ of the instance
 
         """
-        dict_attrs: dict = self.__dict__
+        dict_attrs: dict = deepcopy(self.__dict__)
         class_name = self.__class__.__name__
 
         dt_created_at = getattr(self, "created_at")
