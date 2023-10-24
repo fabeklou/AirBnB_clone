@@ -1,0 +1,55 @@
+div.container .filters {
+  background-color: #fff;
+  height: 70px;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+div.container .filters button {
+  font-size: 18px;
+  background-color: #ff5a5f;
+  color: #fff;
+  height: 48px;
+  width: 20%;
+  border: none;
+  border-radius: 4px;
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: 300ms ease-in-out;
+}
+
+div.container .filters button:hover {
+  opacity: 90%;
+  cursor: pointer;
+}
+
+div.container .filters .locations,
+div.container .filters .amenities {
+  height: 100%;
+  width: 25%;
+  padding-left: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+div.container .filters .locations {
+  border-right: 1px solid #ddd;
+}
+
+div.container .filters .locations h3,
+div.container .filters .amenities h3 {
+  font-weight: 600;
+}
+
+div.container .filters .locations h4,
+div.container .filters .amenities h4 {
+  font-weight: 400;
+  font-size: 14px;
+}
