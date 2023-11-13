@@ -148,3 +148,27 @@
 .container .places div.reviews p {
   font-size: 12px;
 }
+
+@media only screen and (max-width: 480px) {
+  .container .places article div.information {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 80px;
+    padding: 20px 0;
+    gap: 20px;
+  }
+
+  .container .places article div.information > div {
+    height: 55px;
+  }
+
+  .container .places article > h2 {
+    margin-bottom: 20px;
+  }
+
+  .container .places article div.price_by_night {
+    position: static;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+}
